@@ -18,11 +18,11 @@ const std::wstring GetIniPathW()
 	return iniPath;
 }
 
-void PrintMapA(win32iniA::iniMapA)
+void PrintMapA(win32iniA::iniMap)
 {
 	std::string iniPathA = GetIniPathA();
 	auto ai = win32iniA(iniPathA);
-	auto& map = ai.GetMapA();
+	auto& map = ai.GetMap();
 	for (auto& section : map)
 	{
 		std::cout << "section " << section.first << '\n';
@@ -35,11 +35,11 @@ void PrintMapA(win32iniA::iniMapA)
 	}
 }
 
-void PrintMapW(win32iniW::iniMapW)
+void PrintMapW(win32iniW::iniMap)
 {
 	std::wstring iniPathW = GetIniPathW();
 	auto wi = win32iniW(iniPathW);
-	auto& map = wi.GetMapW();
+	auto& map = wi.GetMap();
 	for (auto& section : map)
 	{
 		std::wcout << "section " << section.first << '\n';
@@ -57,12 +57,12 @@ int main()
 	// don't forget GetCurrentDirectory requires the full path of the ini file. NOT THE LOCAL ONES!
 	auto & iniPathA = GetIniPathA();
 	auto ai = win32iniA(iniPathA);
-	auto& ra = ai.GetMapA();
+	auto& ra = ai.GetMap();
 	PrintMapA(ra);
 
 	auto & iniPathW = GetIniPathW();
 	auto wi = win32iniW(iniPathW);
-	auto& rw = wi.GetMapW();
+	auto& rw = wi.GetMap();
 	PrintMapW(rw);
 
 	system("pause");
