@@ -29,22 +29,16 @@
 
 #define WIN32INI_MAX 65535
 
-#ifdef UNICODE
-#define win32ini  win32iniW
-#else
-#define win32ini  win32iniA
-#endif
-
-class win32iniA
+template <class T, class V> class win32ini
 {
 public:
-	using iniKey = std::vector<std::string>;
-	using iniMap = std::map<std::string, std::map<std::string, std::string>>;
+	using iniKey = std::vector<T>;
+	using iniMap = std::map<T, std::map<T, T>>;
 
-	std::string m_iniPath;
+	T m_iniPath;
 	iniMap m_iniMap;
 
-	win32iniA(const std::string iniPath)
+	win32ini(const T iniPath)
 	{
 		m_iniPath = iniPath;
 	}
@@ -69,19 +63,19 @@ public:
 		return m_iniMap;
 	}
 
-	const std::string GetValue(const std::string& section, const std::string& key)
+	const T GetValue(const T& section, const T& key)
 	{
-		char _buffer[WIN32INI_MAX];
-		GetPrivateProfileStringA(section.c_str(), key.c_str(), "", _buffer, WIN32INI_MAX, m_iniPath.c_str());
-		return std::string(_buffer);
+		V _buffer[WIN32INI_MAX];
+		_GetPrivateProfileString(section.c_str(), key.c_str(), nullptr, _buffer, WIN32INI_MAX, m_iniPath.c_str());
+		return T(_buffer);
 	}
 
 	const iniKey GetSections()
 	{
-		std::vector<char> _buffer(WIN32INI_MAX);
-		GetPrivateProfileStringA(nullptr, nullptr, "", _buffer.data(), _buffer.size(), m_iniPath.c_str());
+		std::vector<V> _buffer(WIN32INI_MAX);
+		_GetPrivateProfileString(nullptr, nullptr, nullptr, _buffer.data(), _buffer.size(), m_iniPath.c_str());
 		iniKey sections;
-		std::string word;
+		T word;
 		for (auto& c : _buffer)
 		{
 			if (c)
@@ -97,12 +91,12 @@ public:
 		return sections;
 	}
 
-	const iniKey GetKeys(const std::string& section)
+	const iniKey GetKeys(const T& section)
 	{
-		std::vector<char> _buffer(WIN32INI_MAX);
-		GetPrivateProfileStringA(section.c_str(), nullptr, "", _buffer.data(), _buffer.size(), m_iniPath.c_str());
+		std::vector<V> _buffer(WIN32INI_MAX);
+		_GetPrivateProfileString(section.c_str(), nullptr, nullptr, _buffer.data(), _buffer.size(), m_iniPath.c_str());
 		iniKey keys;
-		std::string word;
+		T word;
 		for (auto& c : _buffer)
 		{
 			if (c)
@@ -117,89 +111,37 @@ public:
 		}
 		return keys;
 	}
+
+	int _GetPrivateProfileString(
+		const V* lpAppName,
+		const V* lpKeyName,
+		const V* lpDefault,
+		V* lpReturnedString,
+		DWORD nSize,
+		const V* lpFileName);
 };
 
-class win32iniW
+using win32iniA = win32ini<std::string, char>;
+using win32iniW = win32ini<std::wstring, wchar_t>;
+
+template <> inline int win32ini<std::string, char>::_GetPrivateProfileString(
+	const char* lpAppName,
+	const char* lpKeyName,
+	const char* lpDefault,
+	char* lpReturnedString,
+	DWORD nSize,
+	const char* lpFileName)
 {
-public:
-	using iniKey = std::vector<std::wstring>;
-	using iniMap = std::map<std::wstring, std::map<std::wstring, std::wstring>>;
+	return GetPrivateProfileStringA(lpAppName, lpKeyName, lpDefault ? lpDefault : "", lpReturnedString, nSize, lpFileName);
+}
 
-	std::wstring m_iniPath;
-	iniMap m_iniMap;
-
-	win32iniW(const std::wstring iniPath)
-	{
-		m_iniPath = iniPath;
-	}
-
-	void ClearMap()
-	{
-		m_iniMap.clear();
-	}
-
-	const iniMap GetMap()
-	{
-		if (m_iniMap.empty())
-		{
-			auto& sections = GetSections();
-			for (auto& section : sections)
-			{
-				auto& keys = GetKeys(section);
-				for (auto& key : keys)
-					m_iniMap[section][key] = GetValue(section, key);
-			}
-		}
-		return m_iniMap;
-	}
-
-	const std::wstring GetValue(const std::wstring& section, const std::wstring& key)
-	{
-		wchar_t _buffer[WIN32INI_MAX];
-		GetPrivateProfileStringW(section.c_str(), key.c_str(), L"", _buffer, WIN32INI_MAX, m_iniPath.c_str());
-		return std::wstring(_buffer);
-	}
-
-	const iniKey GetSections()
-	{
-		std::vector<wchar_t> _buffer(WIN32INI_MAX);
-		GetPrivateProfileStringW(nullptr, nullptr, L"", _buffer.data(), _buffer.size(), m_iniPath.c_str());
-		iniKey sections;
-		std::wstring word;
-		for (auto& c : _buffer)
-		{
-			if (c)
-				word += c;
-			else
-			{
-				if (word.empty())
-					break;
-				sections.push_back(word);
-				word.clear();
-			}
-		}
-		return sections;
-	}
-
-	const iniKey GetKeys(const std::wstring& section)
-	{
-		std::vector<wchar_t> _buffer(WIN32INI_MAX);
-		GetPrivateProfileStringW(section.c_str(), nullptr, L"", _buffer.data(), _buffer.size(), m_iniPath.c_str());
-		iniKey keys;
-		std::wstring word;
-		for (auto& c : _buffer)
-		{
-			if (c)
-				word += c;
-			else
-			{
-				if (word.empty())
-					break;
-				keys.push_back(word);
-				word.clear();
-			}
-		}
-		return keys;
-	}
-};
-
+template <> inline int win32ini<std::wstring, wchar_t>::_GetPrivateProfileString(
+	const wchar_t* lpAppName,
+	const wchar_t* lpKeyName,
+	const wchar_t* lpDefault,
+	wchar_t* lpReturnedString,
+	DWORD nSize,
+	const wchar_t* lpFileName)
+{
+	return GetPrivateProfileStringW(lpAppName, lpKeyName, lpDefault ? lpDefault : L"", lpReturnedString, nSize, lpFileName);
+}
