@@ -37,21 +37,42 @@ void PrintMapA(win32iniA::iniMap)
 	}
 }
 
+//#define ENABLE_FONT_CHANGE
 void PrintMapW(win32iniW::iniMap)
 {
 	auto oldmode = _setmode(_fileno(stdout), _O_WTEXT); // windows console is not able to properly display unicode strings if you don't change mode and font
-	std::wstring iniPathW = GetIniPathW();
-	auto wi = win32iniW(iniPathW);
-	auto& map = wi.GetMap();
-	for (auto& section : map)
+#ifdef ENABLE_FONT_CHANGE
+	CONSOLE_FONT_INFOEX oldcfi{};
+	GetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &oldcfi);
+	CONSOLE_FONT_INFOEX newcfi;
+	newcfi.cbSize = sizeof newcfi;
+	newcfi.nFont = 0;
+	newcfi.dwFontSize.X = 0;
+	newcfi.dwFontSize.Y = 14;
+	newcfi.FontFamily = FF_DONTCARE;
+	newcfi.FontWeight = FW_NORMAL;
+	wcscpy(newcfi.FaceName, L"Lucida Console");
+	system("pause");
+	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &newcfi);
+#endif
 	{
-		std::wcout << "section " << section.first << '\n';
-		for (auto& key : section.second)
+		std::wstring iniPathW = GetIniPathW();
+		auto wi = win32iniW(iniPathW);
+		auto& map = wi.GetMap();
+		for (auto& section : map)
 		{
-			//map[section][key] = key.second;
-			std::wcout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
+			std::wcout << "section " << section.first << '\n';
+			for (auto& key : section.second)
+			{
+				//map[section][key] = key.second;
+				std::wcout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
+			}
 		}
 	}
+#ifdef ENABLE_FONT_CHANGE
+	system("pause");
+	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &oldcfi);
+#endif
 	_setmode(_fileno(stdout), oldmode); // reset
 }
 
