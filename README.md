@@ -12,6 +12,7 @@ How to use it:
 std::map<std::wstring, std::map<std::wstring, std::wstring>> translations;
 std::wstring iniPathW = GetIniPathW(); // absolute path of the .ini
 
+// you may properly need to allow unicode in your console to properly display the values
 auto wi = win32iniW(iniPathW);
 auto& map = wi.GetMap();
 for (auto& section : map)
