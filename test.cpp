@@ -26,12 +26,13 @@ void PrintMapA(win32iniA::iniMap)
 	std::string iniPathA = GetIniPathA();
 	auto ai = win32iniA(iniPathA);
 	auto& map = ai.GetMap();
+	//std::map<std::string, std::map<std::string, std::string>> translations;
 	for (auto& section : map)
 	{
 		std::cout << "section " << section.first << '\n';
 		for (auto& key : section.second)
 		{
-			//map[section][key] = key.second;
+			//translations[section.first][key.first] = key.second;
 			std::cout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
 		}
 	}
@@ -56,6 +57,7 @@ void PrintMapW(win32iniW::iniMap)
 	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &newcfi);
 #endif
 	{
+		//std::map<std::wstring, std::map<std::wstring, std::wstring>> translations;
 		std::wstring iniPathW = GetIniPathW();
 		auto wi = win32iniW(iniPathW);
 		auto& map = wi.GetMap();
@@ -64,7 +66,7 @@ void PrintMapW(win32iniW::iniMap)
 			std::wcout << "section " << section.first << '\n';
 			for (auto& key : section.second)
 			{
-				//map[section][key] = key.second;
+				//translations[section.first][key.first] = key.second;
 				std::wcout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
 			}
 		}
