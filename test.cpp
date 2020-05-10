@@ -1,5 +1,8 @@
 #include "win32ini.h"
 #include <iostream>
+#include <fcntl.h>
+#include <io.h>
+
 const std::string GetIniPathA()
 {
 	char buffer[MAX_PATH];
@@ -36,6 +39,7 @@ void PrintMapA(win32iniA::iniMap)
 
 void PrintMapW(win32iniW::iniMap)
 {
+	auto oldmode = _setmode(_fileno(stdout), _O_WTEXT); // windows console is not able to properly display unicode strings if you don't change mode and font
 	std::wstring iniPathW = GetIniPathW();
 	auto wi = win32iniW(iniPathW);
 	auto& map = wi.GetMap();
@@ -48,6 +52,7 @@ void PrintMapW(win32iniW::iniMap)
 			std::wcout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
 		}
 	}
+	_setmode(_fileno(stdout), oldmode); // reset
 }
 
 int main()
