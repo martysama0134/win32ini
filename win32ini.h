@@ -44,12 +44,12 @@ public:
 	std::string m_iniPathA;
 	iniMapA m_iniMapA;
 
-	win32ini(std::string iniPathW)
+	win32iniA(std::string iniPathA)
 	{
-		m_iniPathA = iniPathW;
+		m_iniPathA = iniPathA;
 	}
 
-	const iniMapA GetMapW()
+	const iniMapA GetMapA()
 	{
 		if (m_iniMapA.empty())
 		{
@@ -123,7 +123,7 @@ public:
 	std::wstring m_iniPathW;
 	iniMapW m_iniMapW;
 
-	win32ini(std::wstring iniPathW)
+	win32iniW(std::wstring iniPathW)
 	{
 		m_iniPathW = iniPathW;
 	}
