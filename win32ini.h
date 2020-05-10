@@ -44,9 +44,14 @@ public:
 	std::string m_iniPath;
 	iniMap m_iniMap;
 
-	win32iniA(std::string iniPathA)
+	win32iniA(const std::string iniPath)
 	{
-		m_iniPath = iniPathA;
+		m_iniPath = iniPath;
+	}
+
+	void ClearMap()
+	{
+		m_iniMap.clear();
 	}
 
 	const iniMap GetMap()
@@ -123,9 +128,14 @@ public:
 	std::wstring m_iniPath;
 	iniMap m_iniMap;
 
-	win32iniW(std::wstring iniPathW)
+	win32iniW(const std::wstring iniPath)
 	{
-		m_iniPath = iniPathW;
+		m_iniPath = iniPath;
+	}
+
+	void ClearMap()
+	{
+		m_iniMap.clear();
 	}
 
 	const iniMap GetMap()

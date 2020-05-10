@@ -26,11 +26,10 @@ void PrintMapA(win32iniA::iniMap)
 	for (auto& section : map)
 	{
 		std::cout << "section " << section.first << '\n';
-		for (auto& value : section.second)
+		for (auto& key : section.second)
 		{
-			std::cout << "value " << value.first << '\n';
-			//map[section][value] = value.second;
-			std::cout << "map[" << section.first << "][" << value.first << "] = " << value.second << '\n';
+			//map[section][key] = key.second;
+			std::cout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
 		}
 	}
 }
@@ -43,11 +42,10 @@ void PrintMapW(win32iniW::iniMap)
 	for (auto& section : map)
 	{
 		std::wcout << "section " << section.first << '\n';
-		for (auto& value : section.second)
+		for (auto& key : section.second)
 		{
-			std::wcout << "value " << value.first << '\n';
-			//map[section][value] = value.second;
-			std::wcout << "map[" << section.first << "][" << value.first << "] = " << value.second << '\n';
+			//map[section][key] = key.second;
+			std::wcout << "map[" << section.first << "][" << key.first << "] = " << key.second << '\n';
 		}
 	}
 }
