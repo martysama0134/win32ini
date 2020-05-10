@@ -1,2 +1,2 @@
 # win32ini
-ini reader via win32 api using c++ with unicode support
+header-only ini reader via win32 api using c++ with unicode support
