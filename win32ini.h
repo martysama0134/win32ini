@@ -21,6 +21,7 @@
 // SOFTWARE
 #pragma once
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -28,6 +29,7 @@
 #include "windows.h"
 
 #define WIN32INI_MAX 65535
+#define WIN32INI_FORCE_LOWER
 
 template <class T, class V> class win32ini
 {
@@ -105,12 +107,17 @@ public:
 			{
 				if (word.empty())
 					break;
+#ifdef WIN32INI_FORCE_LOWER
+				ToLower(word);
+#endif
 				keys.push_back(word);
 				word.clear();
 			}
 		}
 		return keys;
 	}
+
+	void ToLower(T& word);
 
 	int _GetPrivateProfileString(
 		const V* lpAppName,
@@ -123,6 +130,16 @@ public:
 
 using win32iniA = win32ini<std::string, char>;
 using win32iniW = win32ini<std::wstring, wchar_t>;
+
+template <> inline void win32ini<std::string, char>::ToLower(std::string& word)
+{
+	std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+}
+
+template <> inline void win32ini<std::wstring, wchar_t>::ToLower(std::wstring& word)
+{
+	std::transform(word.begin(), word.end(), word.begin(), ::towlower);
+}
 
 template <> inline int win32ini<std::string, char>::_GetPrivateProfileString(
 	const char* lpAppName,
