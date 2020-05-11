@@ -59,17 +59,26 @@ public:
 			{
 				auto& keys = GetKeys(section);
 				for (auto& key : keys)
-					m_iniMap[section][key] = GetValue(section, key);
+					m_iniMap[section][key] = _GetValue(section, key);
 			}
 		}
 		return m_iniMap;
 	}
 
-	const T GetValue(const T& section, const T& key)
+	const T _GetValue(const T& section, const T& key) // internal version skipping lowercase
 	{
 		V _buffer[WIN32INI_MAX];
 		_GetPrivateProfileString(section.c_str(), key.c_str(), nullptr, _buffer, WIN32INI_MAX, m_iniPath.c_str());
 		return T(_buffer);
+	}
+
+	const T GetValue(T section, T key)
+	{
+#ifdef WIN32INI_FORCE_LOWER
+		ToLowerInPlace(section);
+		ToLowerInPlace(key);
+#endif
+		return _GetValue(section, key);
 	}
 
 	const iniKey GetSections()
@@ -86,6 +95,9 @@ public:
 			{
 				if (word.empty())
 					break;
+#ifdef WIN32INI_FORCE_LOWER
+				ToLowerInPlace(word);
+#endif
 				sections.push_back(word);
 				word.clear();
 			}
@@ -108,7 +120,7 @@ public:
 				if (word.empty())
 					break;
 #ifdef WIN32INI_FORCE_LOWER
-				ToLower(word);
+				ToLowerInPlace(word);
 #endif
 				keys.push_back(word);
 				word.clear();
@@ -117,7 +129,13 @@ public:
 		return keys;
 	}
 
-	void ToLower(T& word);
+	void ToLowerInPlace(T& word);
+
+	T ToLower(T word)
+	{
+		ToLowerInPlace(word);
+		return word;
+	}
 
 	int _GetPrivateProfileString(
 		const V* lpAppName,
@@ -131,12 +149,12 @@ public:
 using win32iniA = win32ini<std::string, char>;
 using win32iniW = win32ini<std::wstring, wchar_t>;
 
-template <> inline void win32ini<std::string, char>::ToLower(std::string& word)
+template <> inline void win32ini<std::string, char>::ToLowerInPlace(std::string& word)
 {
 	std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 }
 
-template <> inline void win32ini<std::wstring, wchar_t>::ToLower(std::wstring& word)
+template <> inline void win32ini<std::wstring, wchar_t>::ToLowerInPlace(std::wstring& word)
 {
 	std::transform(word.begin(), word.end(), word.begin(), ::towlower);
 }
